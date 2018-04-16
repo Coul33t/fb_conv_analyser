@@ -40,6 +40,12 @@ class DataCSV:
     def rows_number(self):
         return self.df.shape[0]
 
+    def get_unique_conversations(self):
+        return self.df.thread.unique()
+
+    def get_unique_senders(self):
+        return self.df.sender.unique()
+
     def date_ref(self, date_str):
         return datetime.strptime(date_str[:-5] + date_str[-5:].replace(':', ''), '%Y-%m-%dT%H:%M%z')
 
@@ -84,7 +90,7 @@ class DataCSV:
 
         return counter
 
-    def plot_number_words(self, person=None, beg=None, end=None):
+    def plot_number_words(self, name, beg=None, end=None, week=True, log=False, percentage=False):
         
         data = self.df
 
@@ -103,38 +109,44 @@ class DataCSV:
             if not end:
                 end = data.iloc[-1]['date'].date()
 
-            for i in range((end - beg).days):
+            for i in range((end - beg).days + 1):
                 words_per_day[name][(beg + timedelta(i)).strftime('%d-%m-%Y')] = 0
 
         counter = 0
 
-        current_day = data.iloc[0].date.date()
+        for name in data.sender.unique():
+            current_day = data.iloc[0].date.date()
+            for idx, row in data.iterrows():
+                if row['sender'] == name:
+                    if row['date'].date() > current_day:
+                        current_day = row['date'].date()
+                        words_per_day[name][current_day.strftime('%d-%m-%Y')] = counter
+                        counter = 0
 
-        for idx, row in data.iterrows():
-            pdb.set_trace()
-            if row['date'].date() > current_day:
-                current_day = row['date'].date()
-                words_per_day[row['sender']][current_day.strftime('%d-%m-%Y')] = counter
-                counter = 0
-
-            counter += len(str(row['message']).split())
+                
+                    counter += len(str(row['message']).split())
 
         yq = list(words_per_day['Quentin Cld'].values())
         # as weeks
-        yq2 = [sum(yq[x:x+6]) for x in range(0,len(yq), 7)]
+        if week:
+            yq = [sum(yq[x:x+6]) for x in range(0,len(yq), 7)]
 
-        ym = list(words_per_day['Marie Sea'].values())
+        ym = list(words_per_day[name].values())
         # as weeks
-        ym2 = [sum(ym[x:x+6]) for x in range(0,len(ym), 7)]
+        if week:
+            ym = [sum(ym[x:x+6]) for x in range(0,len(ym), 7)]
        
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
         x = np.asarray([v for v in range(len(yq))])
 
-        pdb.set_trace()
+
         ax.bar(x-0.1, yq, width=0.2, color='b', align='center', label='Quentin Cld')
-        ax.bar(x+0.1, ym, width=0.2, color='r', align='center', label='Marie Sea')
+        ax.bar(x+0.1, ym, width=0.2, color='r', align='center', label=name)
+
+        if log:
+            ax.set_yscale('log')
 
         plt.title(f'Words count per week (from {beg} to {end})')
         plt.legend()
@@ -144,14 +156,15 @@ class DataCSV:
 
 
 if __name__ == '__main__':
-    data = DataCSV(r'E:\Users\Quentin\Desktop\fb\html\\', r'fb_conv.csv')
-    data.keep_values(thread='Marie Sea')
+    name = 'Margaux Dameron'
+    data = DataCSV(r'C:\Users\quentin\Desktop\FB\facebook-quentincouland\html\\', r'fb_conv.csv')
     pdb.set_trace()
-    print('Conversation: Marie Sea')
+    data.keep_values(thread=name)
+    print(f'Conversation: {name}')
     print(f'Total word count: {data.count_words()}')
     cld_c = data.count_words(column='sender', value='Quentin Cld')
-    sea_c = data.count_words(column='sender', value='Marie Sea')
-    print(f'Quentin Cld word count: {cld_c}')
-    print(f'Marie Sea word count: {sea_c}')
+    nam_c = data.count_words(column='sender', value=name)
+    print(f'Quentin Cld word count: {cld_c} ({100 * cld_c / (cld_c + nam_c)}%)')
+    print(f'{name} word count: {nam_c} ({100 * nam_c / (cld_c + nam_c)}%)')
     data.reformate_date()
-    data.plot_number_words()
+    data.plot_number_words(name)
