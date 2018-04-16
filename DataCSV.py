@@ -1,4 +1,7 @@
 import pandas as pd
+import numpy as np
+
+import matplotlib.pyplot as plt
 
 # Used for encoding
 import locale
@@ -103,28 +106,47 @@ class DataCSV:
             for i in range((end - beg).days):
                 words_per_day[name][(beg + timedelta(i)).strftime('%d-%m-%Y')] = 0
 
-        pdb.set_trace()
         counter = 0
 
         current_day = data.iloc[0].date.date()
 
         for idx, row in data.iterrows():
-
+            pdb.set_trace()
             if row['date'].date() > current_day:
                 current_day = row['date'].date()
                 words_per_day[row['sender']][current_day.strftime('%d-%m-%Y')] = counter
                 counter = 0
 
             counter += len(str(row['message']).split())
-            
+
+        yq = list(words_per_day['Quentin Cld'].values())
+        # as weeks
+        yq2 = [sum(yq[x:x+6]) for x in range(0,len(yq), 7)]
+
+        ym = list(words_per_day['Marie Sea'].values())
+        # as weeks
+        ym2 = [sum(ym[x:x+6]) for x in range(0,len(ym), 7)]
+       
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        x = np.asarray([v for v in range(len(yq))])
 
         pdb.set_trace()
+        ax.bar(x-0.1, yq, width=0.2, color='b', align='center', label='Quentin Cld')
+        ax.bar(x+0.1, ym, width=0.2, color='r', align='center', label='Marie Sea')
+
+        plt.title(f'Words count per week (from {beg} to {end})')
+        plt.legend()
+        plt.show()
+
 
 
 
 if __name__ == '__main__':
-    data = DataCSV(r'C:\Users\quentin\Desktop\FB\facebook-quentincouland\html\\', r'fb_conv.csv')
+    data = DataCSV(r'E:\Users\Quentin\Desktop\fb\html\\', r'fb_conv.csv')
     data.keep_values(thread='Marie Sea')
+    pdb.set_trace()
     print('Conversation: Marie Sea')
     print(f'Total word count: {data.count_words()}')
     cld_c = data.count_words(column='sender', value='Quentin Cld')
@@ -133,4 +155,3 @@ if __name__ == '__main__':
     print(f'Marie Sea word count: {sea_c}')
     data.reformate_date()
     data.plot_number_words()
-    pdb.set_trace()
