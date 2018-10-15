@@ -64,6 +64,11 @@ class Conversation:
         print(f'Number of persons: {len(self.persons)}')
         for person in self.persons.keys():
             print(f'- {person}')
+        duration = self.messages[0]['datetime'] - self.messages[-1]['datetime']
+        hours = int(duration.seconds / 60 / 60)
+        minutes = int(duration.seconds / 60) - 60*int(duration.seconds / 60 / 60)
+        seconds = duration.seconds - minutes * 60 - hours * 60 * 60
+        print(f'Conversation going from {self.messages[-1]["date"]} to {self.messages[0]["date"]}, for a total of {duration.days} days, {hours} hours, {minutes} minutes and {seconds} seconds')
         print(f'Total number of messages: {len(self.messages)}')
         for person, v in self.persons.items():
             print(f'- {person}: {v.number_of_messages}')
@@ -72,7 +77,8 @@ class Conversation:
 def convert_timestamp_to_date(obj):
     """ Adds a new key to each messages dict, being the date in a readable format."""
     for mess in obj.messages:
-            mess['date'] = datetime.utcfromtimestamp(mess['timestamp_ms'] / 1000).strftime('%Y-%m-%d %H:%M:%S')
+        mess['date'] = datetime.utcfromtimestamp(mess['timestamp_ms'] / 1000).strftime('%d-%m-%Y (%H:%M:%S)')
+        mess['datetime'] = datetime.utcfromtimestamp(mess['timestamp_ms'] / 1000)
 
 
 def main():
@@ -96,10 +102,11 @@ def main():
 
     convert_timestamp_to_date(conv)
     conv.convert_persons_timestamp_to_date()
-    conv.persons['Juliette Rbe'].get_messages_date()
+    conv.persons['Juliette Rbe'].get_messages_date(begin=datetime(2018,9,1))
     conv.get_basic_stats()
     pdb.set_trace()
 
 
 if __name__ == '__main__':
     main()
+
