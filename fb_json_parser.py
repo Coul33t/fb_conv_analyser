@@ -1,4 +1,8 @@
 from datetime import datetime
+
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget
+
 import json
 import locale
 import pdb
@@ -33,6 +37,19 @@ class Person:
 
         return list_of_messages
 
+    def number_of_words_per_message(self):
+        messages_length = []
+        for mess in self.messages:
+            messages_length.append(len(mess['content'].split()))
+        return messages_length
+
+    def total_number_of_words(self):
+        sum(number_of_words_per_message)
+
+    def mean_number_of_words(self):
+        messages_length = self.number_of_words_per_message()
+        return sum(messages_length)/len(messages_length)
+
     def get_basic_stats(self):
         print(f'Total number of messages: {self.number_of_messages}')
 
@@ -60,6 +77,7 @@ class Conversation:
         for person in self.persons.values():
             convert_timestamp_to_date(person)
 
+
     def get_basic_stats(self):
         print(f'Number of persons: {len(self.persons)}')
         for person in self.persons.keys():
@@ -80,6 +98,10 @@ def convert_timestamp_to_date(obj):
         mess['date'] = datetime.utcfromtimestamp(mess['timestamp_ms'] / 1000).strftime('%d-%m-%Y (%H:%M:%S)')
         mess['datetime'] = datetime.utcfromtimestamp(mess['timestamp_ms'] / 1000)
 
+
+def plot_single_data(data):
+    pdb.set_trace()
+    pass
 
 def main():
     path = r'C:\Users\quentin\Desktop\fb_json\messages\JulietteRbe_d46ca96a16'
@@ -102,11 +124,22 @@ def main():
 
     convert_timestamp_to_date(conv)
     conv.convert_persons_timestamp_to_date()
-    conv.persons['Juliette Rbe'].get_messages_date(begin=datetime(2018,9,1))
+    print(len(conv.persons['Juliette Rbe'].get_messages_date(begin=datetime(2018,10,1))))
+    print(len(conv.persons['Quentin Cld'].get_messages_date(begin=datetime(2018,10,1))))
     conv.get_basic_stats()
+    plot_single_data(conv.persons['Juliette Rbe'].number_of_words_per_message())
     pdb.set_trace()
 
 
 if __name__ == '__main__':
+    # app = QApplication(sys.argv)
+
+    # w = QWidget()
+    # w.resize(250, 150)
+    # w.move(300, 300)
+    # w.setWindowTitle('Simple')
+    # w.show()
+
+    # sys.exit(app.exec_())
     main()
 
