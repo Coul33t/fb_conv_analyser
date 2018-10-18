@@ -1,7 +1,11 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
+
+import numpy as np
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget
+
+import matplotlib.pyplot as plt
 
 import json
 import locale
@@ -49,6 +53,48 @@ class Person:
     def mean_number_of_words(self):
         messages_length = self.number_of_words_per_message()
         return sum(messages_length)/len(messages_length)
+
+    def number_of_messages_per_day(self):
+        number_of_messages = {}
+
+        beginning = self.messages[-1]['datetime'].date()
+        end = self.messages[0]['datetime'].date()
+        current_day = beginning
+
+        while current_day <= end:
+            number_of_messages[current_day.isoformat()] = 0
+            current_day += timedelta(days=1)
+
+        for mess in self.messages:
+            number_of_messages[mess['datetime'].date().isoformat()] += 1
+
+        return number_of_messages
+
+    def number_of_messages_per_week(self):
+        number_of_messages = {}
+
+        beginning = self.messages[-1]['datetime'].date()
+        end = self.messages[0]['datetime'].date()
+
+        if beginning.isoweekday() != 1:
+            beginning = beginning - timedelta(days=beginning.isoweekday() - 1)
+
+        if end.isoweekday() != 1:
+            end = end - timedelta(days= end.isoweekday() - 1)
+
+        current_week = beginning
+
+        while current_week <= end:
+            number_of_messages[current_week.isoformat()] = 0
+            current_week += timedelta(days=7)
+
+        for mess in self.messages:
+            if mess['datetime'].date().isoweekday() != 1:
+                number_of_messages[(mess['datetime'].date() - timedelta(days=mess['datetime'].date().isoweekday() - 1)).isoformat()] += 1
+            else:
+                number_of_messages[mess['datetime'].date().isoformat()] += 1
+
+        return number_of_messages
 
     def get_basic_stats(self):
         print(f'Total number of messages: {self.number_of_messages}')
@@ -99,12 +145,50 @@ def convert_timestamp_to_date(obj):
         mess['datetime'] = datetime.utcfromtimestamp(mess['timestamp_ms'] / 1000)
 
 
-def plot_single_data(data):
-    pdb.set_trace()
-    pass
+def plot_single_data(data, dates=False):
+    data = np.asarray(list(data.values()))
+    fig = plt.figure(figsize=(12,9))
+    ax = fig.add_subplot(111)
+    ax.spines["top"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+
+    x = np.asarray([i for i in range(len(data))])
+    ax.bar(x, data)
+    plt.show()
+
+def plot_dual_data(data, dates=False):
+    new_data = []
+    #FIX FOR CHARLENE DO NOT KEEP
+    # I keep it here so I'll remember to correct this
+    # (different length because one didn't send message the last week)
+    data[0]['2018-10-08'] = 0
+    for person in data:
+        new_data.append(np.asarray(list(person.values())))
+
+
+    fig = plt.figure(figsize=(12,9))
+    ax = fig.add_subplot(111)
+    ax.spines["top"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+
+    x = np.asarray([i for i in range(len(new_data[0]))])
+
+    ax.bar(x, new_data[0], width=0.5, color='b', align='center')
+    ax.bar(x, new_data[1], bottom=new_data[0], width=0.5, color='r', align='center')
+    plt.show()
 
 def main():
-    path = r'C:\Users\quentin\Desktop\fb_json\messages\JulietteRbe_d46ca96a16'
+    path = r'C:\Users\quentin\Desktop\fb_json\messages\CharleneLemarchand_5e165fd540'
 
     peoples = ()
 
@@ -124,12 +208,14 @@ def main():
 
     convert_timestamp_to_date(conv)
     conv.convert_persons_timestamp_to_date()
-    print(len(conv.persons['Juliette Rbe'].get_messages_date(begin=datetime(2018,10,1))))
+    print(len(conv.persons['Charl\u00c3\u00a8ne Lemarchand'].get_messages_date(begin=datetime(2018,10,1))))
     print(len(conv.persons['Quentin Cld'].get_messages_date(begin=datetime(2018,10,1))))
     conv.get_basic_stats()
-    plot_single_data(conv.persons['Juliette Rbe'].number_of_words_per_message())
-    pdb.set_trace()
-
+    # plot_single_data(conv.persons['Juliette Rbe'].number_of_messages_per_day())
+    # plot_dual_data([conv.persons['Juliette Rbe'].number_of_messages_per_day(),
+    #                 conv.persons['Quentin Cld'].number_of_messages_per_day()])
+    plot_dual_data([conv.persons['Charl\u00c3\u00a8ne Lemarchand'].number_of_messages_per_week(),
+                    conv.persons['Quentin Cld'].number_of_messages_per_week()])
 
 if __name__ == '__main__':
     # app = QApplication(sys.argv)
