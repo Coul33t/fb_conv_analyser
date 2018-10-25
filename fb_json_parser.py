@@ -1,9 +1,14 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime, date, timedelta
 
 import numpy as np
 
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget
+
+import os
+
+from PyQt5.QtWidgets import (QWidget, QLabel,
+    QComboBox, QApplication)
 
 import matplotlib.pyplot as plt
 
@@ -187,6 +192,7 @@ def plot_dual_data(data, dates=False):
     ax.bar(x, new_data[1], bottom=new_data[0], width=0.5, color='r', align='center')
     plt.show()
 
+
 def main():
     path = r'C:\Users\quentin\Desktop\fb_json\messages\CharleneLemarchand_5e165fd540'
 
@@ -218,14 +224,5 @@ def main():
                     conv.persons['Quentin Cld'].number_of_messages_per_week()])
 
 if __name__ == '__main__':
-    # app = QApplication(sys.argv)
-
-    # w = QWidget()
-    # w.resize(250, 150)
-    # w.move(300, 300)
-    # w.setWindowTitle('Simple')
-    # w.show()
-
-    # sys.exit(app.exec_())
     main()
 
