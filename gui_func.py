@@ -1,6 +1,43 @@
 import os
+import locale
+import json
 
-def set_conversation_list(combobox):
+import matplotlib.pyplot as plt
+from datetime import datetime, date, timedelta
+
+from conversation import Conversation
+from tools import convert_timestamp_to_date
+import pdb
+
+def set_conversation_list(path):
+        fb_user_ignored = 0
+        print("Creating name list from conversation folder...")
+        yo = [name.encode('latin1').decode('utf8') for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+        list_of_conv = []
+
+        for name in yo:
+            if name.split("_")[0].lower() == "facebookuser":
+                fb_user_ignored += 1
+            else:
+                try:
+                    with open(path + r'\\' + name + r'\message.json', 'r', encoding=locale.getpreferredencoding()) as f:
+                        jsonf = json.load(f)
+
+                        for k, v in jsonf.items():
+                            if k == 'participants':
+                                if len(v) > 1:
+                                    list_of_conv.append([", ".join([x['name'].encode('latin1').decode('utf8') for x in v]), name])
+                            break
+
+                except FileNotFoundError:
+                    print(f'WARNING: {name} does not have a message.json file')
+
+        print(f'WARNING: \'facebookuser\' ignored: {fb_user_ignored}')
+
+        return list_of_conv
+
+
+def set_conversation_list_cached(combobox):
         fb_user_ignored = 0
 
         if os.path.isdir(os.getcwd() + r'\cache') and os.path.exists(os.getcwd() + r'\cache\name_list_cache.txt'):
@@ -46,3 +83,27 @@ def set_conversation_list(combobox):
                     except:
                         name = name.encode('utf8')
                         list_file.write(f'{name}\n')
+
+
+def load_conv_data(path):
+    conv = Conversation()
+
+    with open(path + r'\message.json', 'r', encoding=locale.getpreferredencoding()) as f:
+        jsonf = json.load(f)
+
+        for k, v in jsonf.items():
+            if k == 'participants':
+                for names in v:
+                    conv.add_name(names['name'].encode('latin1').decode('utf8'))
+
+            if k == 'messages':
+                for single_message in v:
+                    conv.add_message(single_message)
+
+    convert_timestamp_to_date(conv)
+    conv.convert_persons_timestamp_to_date()
+
+    return conv
+
+def get_graph():
+    pass
