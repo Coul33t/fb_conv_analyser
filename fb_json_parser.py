@@ -118,10 +118,10 @@ class Conversation:
         self.messages.append(message)
 
         # In case one of the people isn't in the list (shouldn't be, but eh)
-        if message['sender_name'] not in self.persons.keys():
-            self.persons[message['sender_name']] = Person(message['sender_name'])
+        if message['sender_name'].encode('latin1').decode('utf8') not in self.persons.keys():
+            self.persons[message['sender_name'].encode('latin1').decode('utf8')] = Person(message['sender_name'].encode('latin1').decode('utf8'))
 
-        self.persons[message['sender_name']].add_message(message)
+        self.persons[message['sender_name'].encode('latin1').decode('utf8')].add_message(message)
 
     def convert_persons_timestamp_to_date(self):
         """ Adds a new key to each messages dict, being the date in a readable format."""
@@ -171,7 +171,9 @@ def plot_dual_data(data, dates=False):
     #FIX FOR CHARLENE DO NOT KEEP
     # I keep it here so I'll remember to correct this
     # (different length because one didn't send message the last week)
-    data[0]['2018-10-08'] = 0
+    #data[0]['2018-10-08'] = 0
+    #FIX FOR MAELISS
+    data[1]['2018-10-08'] = 0
     for person in data:
         new_data.append(np.asarray(list(person.values())))
 
@@ -194,7 +196,7 @@ def plot_dual_data(data, dates=False):
 
 
 def main():
-    path = r'C:\Users\quentin\Desktop\fb_json\messages\CharleneLemarchand_5e165fd540'
+    path = r'C:\Users\quentin\Desktop\fb_json\messages\MaelissCoue_1fd470b49e'
 
     peoples = ()
 
@@ -206,7 +208,7 @@ def main():
         for k, v in jsonf.items():
             if k == 'participants':
                 for names in v:
-                    conv.add_name(names['name'])
+                    conv.add_name(names['name'].encode('latin1').decode('utf8'))
 
             if k == 'messages':
                 for single_message in v:
@@ -214,13 +216,14 @@ def main():
 
     convert_timestamp_to_date(conv)
     conv.convert_persons_timestamp_to_date()
-    print(len(conv.persons['Charl\u00c3\u00a8ne Lemarchand'].get_messages_date(begin=datetime(2018,10,1))))
+
+    print(len(conv.persons['Maëliss Coué'].get_messages_date(begin=datetime(2018,10,1))))
     print(len(conv.persons['Quentin Cld'].get_messages_date(begin=datetime(2018,10,1))))
     conv.get_basic_stats()
     # plot_single_data(conv.persons['Juliette Rbe'].number_of_messages_per_day())
     # plot_dual_data([conv.persons['Juliette Rbe'].number_of_messages_per_day(),
     #                 conv.persons['Quentin Cld'].number_of_messages_per_day()])
-    plot_dual_data([conv.persons['Charl\u00c3\u00a8ne Lemarchand'].number_of_messages_per_week(),
+    plot_dual_data([conv.persons['Maëliss Coué'].number_of_messages_per_week(),
                     conv.persons['Quentin Cld'].number_of_messages_per_week()])
 
 if __name__ == '__main__':
