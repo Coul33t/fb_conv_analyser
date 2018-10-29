@@ -38,7 +38,6 @@ def set_conversation_list(path):
 
         return list_of_conv
 
-
 def set_conversation_list_cached(combobox):
         fb_user_ignored = 0
 
@@ -86,7 +85,6 @@ def set_conversation_list_cached(combobox):
                         name = name.encode('utf8')
                         list_file.write(f'{name}\n')
 
-
 def load_conv_data(path):
     conv = Conversation()
 
@@ -100,6 +98,7 @@ def load_conv_data(path):
 
             if k == 'messages':
                 for single_message in v:
+                    single_message['sender_name'] = single_message['sender_name'].encode('latin1').decode('utf8')
                     conv.add_message(single_message)
 
     convert_timestamp_to_date(conv)
@@ -124,16 +123,18 @@ def plot_single_data(data, dates=False):
     plt.show()
 
 def plot_dual_data(data, dates=False):
-    new_data = []
     #FIX FOR CHARLENE DO NOT KEEP
     # I keep it here so I'll remember to correct this
     # (different length because one didn't send message the last week)
     #data[0]['2018-10-08'] = 0
     #FIX FOR MAELISS
     # data[1]['2018-10-08'] = 0
-    for person in data:
-        new_data.append(np.asarray(list(person.values())))
 
+    pdb.set_trace()
+    new_data = []
+
+    for k in data.keys():
+        new_data.append(np.asarray(list(data[k].values())))
 
     fig = plt.figure(figsize=(12,9))
     ax = fig.add_subplot(111)
@@ -170,7 +171,7 @@ def plot_multiple_data(data, dates=False):
 
     x = np.asarray([i for i in range(len(new_data[0]))])
 
-    #colours = 
+    #colours =
     for i, p in enumerate(new_data):
         if i == 0:
             ax.bar(x, p, width=0.5, color='b', align='center')

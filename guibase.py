@@ -13,6 +13,7 @@ from datetime import datetime, date, timedelta
 from conversation import Conversation
 from person import Person
 
+from tools import normalise_length
 import gui_func
 
 import pdb
@@ -177,6 +178,8 @@ class Ui_MainWindow(object):
         self.textbrowser_conv_stats.setText(self.current_conv.get_basic_stats())
 
     def get_graph(self):
+        self.current_conv.get_all_messages()
+
         beg_y = int(self.lineedit_beg_year.text() or 0)
         beg_m = int(self.lineedit_beg_month.text() or 0)
         beg_d = int(self.lineedit_beg_day.text() or 0)
@@ -208,14 +211,13 @@ class Ui_MainWindow(object):
 
         beginning = datetime(beg_y, beg_m, beg_d)
         end = datetime(end_y, end_m, end_d)
-        
+
         frequency = self.combobox_frequency.currentText()
         your_name = self.combobox_your_name.currentText()
         other_name, = [x for x in self.current_conv.persons.keys() if x != your_name]
 
         if frequency == 'Weekly':
-            gui_func.plot_dual_data([self.current_conv.persons[other_name].number_of_messages_per_week(),
-                                     self.current_conv.persons[your_name].number_of_messages_per_week()],
+            gui_func.plot_dual_data(self.current_conv.get_all_messages('Weekly'),
                                      [beginning, end])
 
 

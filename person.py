@@ -51,11 +51,11 @@ class Person:
         current_day = beginning
 
         while current_day <= end:
-            number_of_messages[current_day.isoformat()] = 0
+            number_of_messages[current_day] = 0
             current_day += timedelta(days=1)
 
         for mess in self.messages:
-            number_of_messages[mess['datetime'].date().isoformat()] += 1
+            number_of_messages[mess['datetime'].date()] += 1
 
         return number_of_messages
 
@@ -74,14 +74,14 @@ class Person:
         current_week = beginning
 
         while current_week <= end:
-            number_of_messages[current_week.isoformat()] = 0
+            number_of_messages[current_week] = 0
             current_week += timedelta(days=7)
 
         for mess in self.messages:
             if mess['datetime'].date().isoweekday() != 1:
-                number_of_messages[(mess['datetime'].date() - timedelta(days=mess['datetime'].date().isoweekday() - 1)).isoformat()] += 1
+                number_of_messages[(mess['datetime'].date() - timedelta(days=mess['datetime'].date().isoweekday() - 1))] += 1
             else:
-                number_of_messages[mess['datetime'].date().isoformat()] += 1
+                number_of_messages[mess['datetime'].date()] += 1
 
         return number_of_messages
 

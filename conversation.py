@@ -1,5 +1,8 @@
 from person import Person
-from tools import convert_timestamp_to_date
+from tools import convert_timestamp_to_date, normalise_length
+from datetime import datetime
+
+import pdb
 
 class Conversation:
     def __init__(self):
@@ -29,10 +32,25 @@ class Conversation:
             if message['timestamp_ms'] > self.extremum_dates[1]:
                 self.extremum_dates[1] = message['timestamp_ms']
 
+
     def convert_persons_timestamp_to_date(self):
         """ Adds a new key to each messages dict, being the date in a readable format."""
         for person in self.persons.values():
             convert_timestamp_to_date(person)
+
+
+    def get_all_messages(self, frequency='Weekly'):
+        all_mess = {}
+
+        if frequency == 'Weekly':
+            for person in data.keys():
+                all_mess[person] = self.persons[person].number_of_messages_per_week()
+
+        elif frequency == 'Daily':
+            for person in data.keys():
+                all_mess[person] = self.persons[person].number_of_messages_per_day()
+
+        return all_mess
 
 
     def get_basic_stats(self):
