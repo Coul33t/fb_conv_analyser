@@ -2,7 +2,9 @@ import os
 import locale
 import json
 
+import numpy as np
 import matplotlib.pyplot as plt
+
 from datetime import datetime, date, timedelta
 
 from conversation import Conversation
@@ -105,5 +107,73 @@ def load_conv_data(path):
 
     return conv
 
-def get_graph():
-    pass
+def plot_single_data(data, dates=False):
+    data = np.asarray(list(data.values()))
+    fig = plt.figure(figsize=(12,9))
+    ax = fig.add_subplot(111)
+    ax.spines["top"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+
+    x = np.asarray([i for i in range(len(data))])
+    ax.bar(x, data)
+    plt.show()
+
+def plot_dual_data(data, dates=False):
+    new_data = []
+    #FIX FOR CHARLENE DO NOT KEEP
+    # I keep it here so I'll remember to correct this
+    # (different length because one didn't send message the last week)
+    #data[0]['2018-10-08'] = 0
+    #FIX FOR MAELISS
+    # data[1]['2018-10-08'] = 0
+    for person in data:
+        new_data.append(np.asarray(list(person.values())))
+
+
+    fig = plt.figure(figsize=(12,9))
+    ax = fig.add_subplot(111)
+    ax.spines["top"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+
+    x = np.asarray([i for i in range(len(new_data[0]))])
+
+    ax.bar(x, new_data[0], width=0.5, color='b', align='center')
+    ax.bar(x, new_data[1], bottom=new_data[0], width=0.5, color='r', align='center')
+
+    plt.show()
+
+def plot_multiple_data(data, dates=False):
+    new_data = []
+
+    for person in data:
+        new_data.append(np.asarray(list(person.values())))
+
+    fig = plt.figure(figsize=(12,9))
+    ax = fig.add_subplot(111)
+    ax.spines["top"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+
+    x = np.asarray([i for i in range(len(new_data[0]))])
+
+    #colours = 
+    for i, p in enumerate(new_data):
+        if i == 0:
+            ax.bar(x, p, width=0.5, color='b', align='center')
+        else:
+            ax.bar(x, p, bottom=new_data[i-1], width=0.5, color='r', align='center')
+    plt.show()

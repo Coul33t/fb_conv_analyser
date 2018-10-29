@@ -18,6 +18,10 @@ import gui_func
 import pdb
 
 class Ui_MainWindow(object):
+    def __init__(self):
+        self.current_conv = None
+        self.list_of_conv = []
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -173,27 +177,47 @@ class Ui_MainWindow(object):
         self.textbrowser_conv_stats.setText(self.current_conv.get_basic_stats())
 
     def get_graph(self):
-        beg_y = self.lineedit_beg_year.text()
-        beg_m = self.lineedit_beg_month.text()
-        beg_d = self.lineedit_beg_day.text()
+        beg_y = int(self.lineedit_beg_year.text() or 0)
+        beg_m = int(self.lineedit_beg_month.text() or 0)
+        beg_d = int(self.lineedit_beg_day.text() or 0)
 
-        end_y = self.lineedit_end_year.text()
-        end_m = self.lineedit_end_month.text()
-        end_d = self.lineedit_end_day.text()
+        end_y = int(self.lineedit_end_year.text() or 0)
+        end_m = int(self.lineedit_end_month.text() or 0)
+        end_d = int(self.lineedit_end_day.text() or 0)
 
-        if not beg_y:
-            beg_y = datetime.utcfromtimestamp(self.current_conv.extremum_dates[0] / 1000).year
+        beg_extrem = datetime.utcfromtimestamp(self.current_conv.extremum_dates[0] / 1000)
+        end_extrem = datetime.utcfromtimestamp(self.current_conv.extremum_dates[1] / 1000)
 
-        if not beg_m:
-            beg_y = datetime.utcfromtimestamp(self.current_conv.extremum_dates[0] / 1000).month
+        if not beg_y or beg_extrem.year > beg_y > end_extrem.year:
+            beg_y = beg_extrem.year
 
-        if not beg_d:
-            beg_y = datetime.utcfromtimestamp(self.current_conv.extremum_dates[0] / 1000).day
+        if not beg_m or beg_extrem.month > beg_y > end_extrem.month:
+            beg_m = beg_extrem.month
 
-        pdb.set_trace()
-        #if not beg_m or beg_m <
-        beginning = datetime()
-        end = datetime()
+        if not beg_d or beg_extrem.day > beg_y > end_extrem.day:
+            beg_d = beg_extrem.day
+
+        if not end_y or beg_extrem.year > end_y > end_extrem.year:
+            end_y = end_extrem.year
+
+        if not end_m or beg_extrem.month > end_y > end_extrem.month:
+            end_m = end_extrem.month
+
+        if not end_d or beg_extrem.day > end_y > end_extrem.day:
+            end_d = end_extrem.day
+
+        beginning = datetime(beg_y, beg_m, beg_d)
+        end = datetime(end_y, end_m, end_d)
+        
+        frequency = self.combobox_frequency.currentText()
+        your_name = self.combobox_your_name.currentText()
+        other_name, = [x for x in self.current_conv.persons.keys() if x != your_name]
+
+        if frequency == 'Weekly':
+            gui_func.plot_dual_data([self.current_conv.persons[other_name].number_of_messages_per_week(),
+                                     self.current_conv.persons[your_name].number_of_messages_per_week()],
+                                     [beginning, end])
+
 
 
 if __name__ == "__main__":
