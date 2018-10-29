@@ -156,8 +156,8 @@ class DataCSV:
 
 
 if __name__ == '__main__':
-    name = 'Margaux Dameron'
-    data = DataCSV(r'C:\Users\quentin\Desktop\FB\facebook-quentincouland\html\\', r'fb_conv.csv')
+    name = 'Marie Simonot'
+    data = DataCSV(r'E:\Users\Quentin\Desktop\fb\html\\', r'fb_conv.csv')
     pdb.set_trace()
     data.keep_values(thread=name)
     print(f'Conversation: {name}')
