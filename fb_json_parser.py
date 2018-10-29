@@ -53,7 +53,7 @@ class Person:
         return messages_length
 
     def total_number_of_words(self):
-        sum(number_of_words_per_message)
+        sum(self.number_of_words_per_message)
 
     def mean_number_of_words(self):
         messages_length = self.number_of_words_per_message()
