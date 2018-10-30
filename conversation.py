@@ -43,11 +43,11 @@ class Conversation:
         all_mess = {}
 
         if frequency == 'Weekly':
-            for person in data.keys():
+            for person in self.persons.keys():
                 all_mess[person] = self.persons[person].number_of_messages_per_week()
 
         elif frequency == 'Daily':
-            for person in data.keys():
+            for person in self.persons.keys():
                 all_mess[person] = self.persons[person].number_of_messages_per_day()
 
         return all_mess
