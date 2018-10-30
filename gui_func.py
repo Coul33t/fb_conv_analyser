@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, date, timedelta
 
 from conversation import Conversation
-from tools import convert_timestamp_to_date
+from tools import convert_timestamp_to_date, normalise_length
 import pdb
 
 def set_conversation_list(path):
@@ -123,14 +123,8 @@ def plot_single_data(data, dates=False):
     plt.show()
 
 def plot_dual_data(data, dates=False):
-    #FIX FOR CHARLENE DO NOT KEEP
-    # I keep it here so I'll remember to correct this
-    # (different length because one didn't send message the last week)
-    #data[0]['2018-10-08'] = 0
-    #FIX FOR MAELISS
-    # data[1]['2018-10-08'] = 0
 
-    pdb.set_trace()
+    data = normalise_length(data)
     new_data = []
 
     for k in data.keys():
