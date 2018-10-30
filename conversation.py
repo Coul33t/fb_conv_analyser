@@ -39,7 +39,7 @@ class Conversation:
             convert_timestamp_to_date(person)
 
 
-    def get_all_messages(self, frequency='Weekly'):
+    def get_all_messages(self, dates=None, frequency='Weekly'):
         all_mess = {}
 
         if frequency == 'Weekly':
@@ -49,6 +49,10 @@ class Conversation:
         elif frequency == 'Daily':
             for person in self.persons.keys():
                 all_mess[person] = self.persons[person].number_of_messages_per_day()
+
+        elif frequency == 'Total':
+            for person in self.persons.keys():
+                all_mess[person] = len(self.persons[person].messages)
 
         return all_mess
 
