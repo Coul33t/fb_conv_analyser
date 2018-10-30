@@ -106,6 +106,18 @@ class Ui_MainWindow(object):
         self.label_conv_stats = QtWidgets.QLabel(self.centralwidget)
         self.label_conv_stats.setGeometry(QtCore.QRect(480, 180, 191, 16))
         self.label_conv_stats.setObjectName("label_conv_stats")
+        self.combobox_visualisation_type = QtWidgets.QComboBox(self.centralwidget)
+        self.combobox_visualisation_type.setGeometry(QtCore.QRect(240, 250, 221, 22))
+        self.combobox_visualisation_type.setObjectName("combobox_visualisation_type")
+        self.label_visualisation_type = QtWidgets.QLabel(self.centralwidget)
+        self.label_visualisation_type.setGeometry(QtCore.QRect(240, 230, 101, 16))
+        self.label_visualisation_type.setObjectName("label_visualisation_type")
+        self.combobox_data_to_visualise = QtWidgets.QComboBox(self.centralwidget)
+        self.combobox_data_to_visualise.setGeometry(QtCore.QRect(350, 190, 111, 22))
+        self.combobox_data_to_visualise.setObjectName("combobox_data_to_visualise")
+        self.label_data_to_visualise = QtWidgets.QLabel(self.centralwidget)
+        self.label_data_to_visualise.setGeometry(QtCore.QRect(250, 190, 101, 16))
+        self.label_data_to_visualise.setObjectName("label_data_to_visualise")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
@@ -139,6 +151,8 @@ class Ui_MainWindow(object):
         self.pushbutton_load_data.setText(_translate("MainWindow", "Load conversation data"))
         self.label_your_name.setText(_translate("MainWindow", "Your name:"))
         self.label_conv_stats.setText(_translate("MainWindow", "Statistics about the conversation"))
+        self.label_visualisation_type.setText(_translate("MainWindow", "Visualisation type"))
+        self.label_data_to_visualise.setText(_translate("MainWindow", "Data to visualise"))
 
     def link(self):
         self.pushbutton_folder.clicked.connect(self.select_file)
@@ -153,8 +167,21 @@ class Ui_MainWindow(object):
         self.combobox_frequency.addItem('Weekly')
         self.combobox_frequency.addItem('Monthly')
         self.combobox_frequency.addItem('Yearly')
+        self.combobox_frequency.addItem('Total')
 
         self.pushbutton_display.clicked.connect(self.get_graph)
+
+        self.combobox_visualisation_type.addItem('Stacked bar')
+        self.combobox_visualisation_type.addItem('Stacked bar (percentage)')
+        self.combobox_visualisation_type.addItem('Stacked bar (cumulative)')
+        self.combobox_visualisation_type.addItem('Stacked area')
+        self.combobox_visualisation_type.addItem('Stacked area (percentage)')
+        self.combobox_visualisation_type.addItem('Stacked area (cumulative)')
+        self.combobox_visualisation_type.addItem('Pie chart')
+
+
+        self.combobox_data_to_visualise.addItem('Messages')
+        self.combobox_data_to_visualise.addItem('Words')
 
     def select_file(self):
         self.label_folder_path.setText(QtWidgets.QFileDialog.getExistingDirectory())
@@ -168,13 +195,22 @@ class Ui_MainWindow(object):
     def set_names(self):
         data = self.combobox_conversation.currentText()
         data = data.split(", ")
+        self.combobox_your_name.clear()
         for elem in data:
             self.combobox_your_name.addItem(elem)
 
     def get_conv_data(self):
-        name, = [x[1] for x in self.list_of_conv if x[0] == self.combobox_conversation.currentText()]
-        path = self.label_folder_path.text() + '/' + name
-        self.current_conv = gui_func.load_conv_data(path)
+        names = [x[1] for x in self.list_of_conv if x[0] == self.combobox_conversation.currentText()]
+
+        if len(names) == 1:
+            name = names[0]
+            path = self.label_folder_path.text() + '/' + name
+            self.current_conv = gui_func.load_conv_data(path)
+
+        else:
+            # Do " choose between conv " (same=participants, dates, nb messages pour chaque)
+            pass
+
         self.textbrowser_conv_stats.setText(self.current_conv.get_basic_stats())
 
     def get_graph(self):
@@ -214,11 +250,38 @@ class Ui_MainWindow(object):
 
         frequency = self.combobox_frequency.currentText()
         your_name = self.combobox_your_name.currentText()
-        other_name, = [x for x in self.current_conv.persons.keys() if x != your_name]
+        visualisation = self.combobox_visualisation_type.currentText()
+        data_to_visualise = self.combobox_data_to_visualise.currentText()
 
-        if frequency == 'Weekly':
-            gui_func.plot_dual_data(self.current_conv.get_all_messages('Weekly'),
-                                     [beginning, end])
+        other_names = [x for x in self.current_conv.persons.keys() if x != your_name]
+        names = [x for x in self.current_conv.persons.keys()]
+
+        if frequency == 'Weekly' and data_to_visualise == 'Messages':
+            gui_func.plot_multiple_data(self.current_conv.get_all_messages('Weekly'),
+                                        names,
+                                        [data_to_visualise, 'Weeks'],
+                                        dates=[beginning, end],
+                                        visualisation=visualisation)
+
+        elif frequency == 'Weekly' and data_to_visualise == 'Words':
+                pass
+
+        elif frequency == 'Daily' and data_to_visualise == 'Messages':
+            gui_func.plot_multiple_data(self.current_conv.get_all_messages('Daily'),
+                                        names,
+                                        [data_to_visualise, 'Days'],
+                                        dates=[beginning, end],
+                                        visualisation=visualisation)
+
+        elif frequency == 'Daily' and data_to_visualise == 'Words':
+            pass
+
+        elif frequency == 'Total' and data_to_visualise == 'Messages':
+            gui_func.plot_pie_chart(self.current_conv.get_all_messages('Total'),
+                                    names,
+                                    [data_to_visualise, 'Total'],
+                                    dates=[beginning, end],
+                                    visualisation=visualisation)
 
 
 
