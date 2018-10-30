@@ -44,6 +44,9 @@ class Person:
         return sum(messages_length)/len(messages_length)
 
     def number_of_messages_per_day(self):
+        if not self.messages:
+            return {}
+
         number_of_messages = {}
 
         beginning = self.messages[-1]['datetime'].date()
@@ -60,6 +63,9 @@ class Person:
         return number_of_messages
 
     def number_of_messages_per_week(self):
+        if not self.messages:
+            return {}
+
         number_of_messages = {}
 
         beginning = self.messages[-1]['datetime'].date()
