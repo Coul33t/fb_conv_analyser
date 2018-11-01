@@ -257,7 +257,7 @@ class Ui_MainWindow(object):
         names = [x for x in self.current_conv.persons.keys()]
 
         if frequency == 'Weekly' and data_to_visualise == 'Messages':
-            gui_func.plot_multiple_data(self.current_conv.get_all_messages('Weekly'),
+            gui_func.plot_multiple_data(self.current_conv.get_all_messages(dates=[beginning, end], frequency='Weekly'),
                                         names,
                                         [data_to_visualise, 'Weeks'],
                                         dates=[beginning, end],
@@ -267,7 +267,7 @@ class Ui_MainWindow(object):
                 pass
 
         elif frequency == 'Daily' and data_to_visualise == 'Messages':
-            gui_func.plot_multiple_data(self.current_conv.get_all_messages('Daily'),
+            gui_func.plot_multiple_data(self.current_conv.get_all_messages(dates=[beginning, end], frequency='Daily'),
                                         names,
                                         [data_to_visualise, 'Days'],
                                         dates=[beginning, end],
@@ -277,7 +277,7 @@ class Ui_MainWindow(object):
             pass
 
         elif frequency == 'Total' and data_to_visualise == 'Messages':
-            gui_func.plot_pie_chart(self.current_conv.get_all_messages('Total'),
+            gui_func.plot_pie_chart(self.current_conv.get_all_messages(dates=[beginning, end], frequency='Total'),
                                     names,
                                     [data_to_visualise, 'Total'],
                                     dates=[beginning, end],
