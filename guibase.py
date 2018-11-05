@@ -178,6 +178,7 @@ class Ui_MainWindow(object):
         self.combobox_visualisation_type.addItem('Stacked area (percentage)')
         self.combobox_visualisation_type.addItem('Stacked area (cumulative)')
         self.combobox_visualisation_type.addItem('Pie chart')
+        self.combobox_visualisation_type.addItem('Area chart')
 
 
         self.combobox_data_to_visualise.addItem('Messages')
@@ -264,7 +265,11 @@ class Ui_MainWindow(object):
                                         visualisation=visualisation)
 
         elif frequency == 'Weekly' and data_to_visualise == 'Words':
-                pass
+                gui_func.plot_multiple_data(self.current_conv.get_all_words(dates=[beginning, end], frequency='Weekly'),
+                                        names,
+                                        [data_to_visualise, 'Weeks'],
+                                        dates=[beginning, end],
+                                        visualisation=visualisation)
 
         elif frequency == 'Daily' and data_to_visualise == 'Messages':
             gui_func.plot_multiple_data(self.current_conv.get_all_messages(dates=[beginning, end], frequency='Daily'),
@@ -274,7 +279,11 @@ class Ui_MainWindow(object):
                                         visualisation=visualisation)
 
         elif frequency == 'Daily' and data_to_visualise == 'Words':
-            pass
+            gui_func.plot_multiple_data(self.current_conv.get_all_words(dates=[beginning, end], frequency='Daily'),
+                                        names,
+                                        [data_to_visualise, 'Weeks'],
+                                        dates=[beginning, end],
+                                        visualisation=visualisation)
 
         elif frequency == 'Total' and data_to_visualise == 'Messages':
             gui_func.plot_pie_chart(self.current_conv.get_all_messages(dates=[beginning, end], frequency='Total'),
