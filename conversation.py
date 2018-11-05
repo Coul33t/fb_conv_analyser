@@ -39,6 +39,23 @@ class Conversation:
             convert_timestamp_to_date(person)
 
 
+    def get_all_words(self, dates=None, frequency='Weekly'):
+        all_mess = {}
+
+        if frequency == 'Weekly':
+            for person in self.persons.keys():
+                all_mess[person] = self.persons[person].number_of_words_per_week()
+
+        elif frequency == 'Daily':
+            for person in self.persons.keys():
+                all_mess[person] = self.persons[person].number_of_words_per_day()
+
+        elif frequency == 'Total':
+            for person in self.persons.keys():
+                all_mess[person] = len(self.persons[person].messages)
+
+        return all_mess
+
     def get_all_messages(self, dates=None, frequency='Weekly'):
         all_mess = {}
 
@@ -59,15 +76,25 @@ class Conversation:
 
     def get_basic_stats(self):
         string = ""
+
         string += f'Number of persons: {len(self.persons)}\n'
         for person in self.persons.keys():
             string += f'- {person}\n'
+
         duration = self.messages[0]['datetime'] - self.messages[-1]['datetime']
         hours = int(duration.seconds / 60 / 60)
         minutes = int(duration.seconds / 60) - 60*int(duration.seconds / 60 / 60)
         seconds = duration.seconds - minutes * 60 - hours * 60 * 60
+
         string += f'Conversation going from {self.messages[-1]["date"]} to {self.messages[0]["date"]}, for a total of {duration.days} days, {hours} hours, {minutes} minutes and {seconds} seconds\n'
         string += f'Total number of messages: {len(self.messages)}\n'
+
         for person, v in self.persons.items():
-            string += f'- {person}: {v.number_of_messages}\n'
+            string += f'- {person}: {v.number_of_messages} ({(v.number_of_messages / len(self.messages) * 100):.2f} %)\n'
+
+        total_number_of_words = {x.name: x.total_number_of_words() for x in self.persons.values()}
+
+        string += f'Total number of words: {sum(total_number_of_words.values())}\n'
+        for person, v in total_number_of_words.items():
+            string += f'- {person}: {v} ({(v / sum(total_number_of_words.values()) * 100):.2f} %)\n'
         return string

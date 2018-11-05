@@ -37,11 +37,60 @@ class Person:
         return messages_length
 
     def total_number_of_words(self):
-        sum(number_of_words_per_message)
+        words = self.number_of_words_per_message()
+        return sum(words)
 
     def mean_number_of_words(self):
         messages_length = self.number_of_words_per_message()
         return sum(messages_length)/len(messages_length)
+
+    def number_of_words_per_day(self):
+        if not self.messages:
+            return {}
+
+        number_of_words = {}
+
+        beginning = self.messages[-1]['datetime'].date()
+        end = self.messages[0]['datetime'].date()
+        current_day = beginning
+
+        while current_day <= end:
+            number_of_words[current_day] = 0
+            current_day += timedelta(days=1)
+
+        for mess in self.messages:
+            number_of_words[mess['datetime'].date()] += len(mess['content'].split(' '))
+
+        return number_of_words
+
+    def number_of_words_per_week(self):
+        if not self.messages:
+            return {}
+
+        number_of_words = {}
+
+        beginning = self.messages[-1]['datetime'].date()
+        end = self.messages[0]['datetime'].date()
+
+        if beginning.isoweekday() != 1:
+            beginning = beginning - timedelta(days=beginning.isoweekday() - 1)
+
+        if end.isoweekday() != 1:
+            end = end - timedelta(days= end.isoweekday() - 1)
+
+        current_week = beginning
+
+        while current_week <= end:
+            number_of_words[current_week] = 0
+            current_week += timedelta(days=7)
+
+        for mess in self.messages:
+            if mess['datetime'].date().isoweekday() != 1:
+                number_of_words[(mess['datetime'].date() - timedelta(days=mess['datetime'].date().isoweekday() - 1))] += len(mess['content'].split(' '))
+            else:
+                number_of_words[mess['datetime'].date()] += len(mess['content'].split(' '))
+
+        return number_of_words
 
     def number_of_messages_per_day(self):
         if not self.messages:
