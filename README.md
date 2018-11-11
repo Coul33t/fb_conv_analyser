@@ -1,6 +1,6 @@
 # fb_conv_analyser
 
-A small tool I'm currently developping, used to analyse your Facebook conversations with people. For the moment, it can output the total/per person word count, and plot a graph with these data (either per day or per month). In order to use it, you'll need to extract your data from Facebook in the JSON format (Settings -> Your Facebook Information -> Download your information -> Format: JSON).
+A small tool I'm currently developping, used to analyse your Facebook conversations with people. In order to use it, you'll need to extract your data from Facebook in the JSON format (Settings -> Your Facebook Information -> Download your information -> Format: JSON).
 
 Requirement:
 1. Python 3.5+
