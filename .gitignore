@@ -7,3 +7,6 @@ listens.txt
 listens-*.txt
 *.pyc
 *.bak
+
+
+*.txt
