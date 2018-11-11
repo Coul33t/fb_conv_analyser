@@ -118,6 +118,15 @@ class Ui_MainWindow(object):
         self.label_data_to_visualise = QtWidgets.QLabel(self.centralwidget)
         self.label_data_to_visualise.setGeometry(QtCore.QRect(250, 190, 101, 16))
         self.label_data_to_visualise.setObjectName("label_data_to_visualise")
+        self.pushbutton_export = QtWidgets.QPushButton(self.centralwidget)
+        self.pushbutton_export.setGeometry(QtCore.QRect(10, 530, 75, 23))
+        self.pushbutton_export.setObjectName("pushbutton_export")
+        self.combobox_export = QtWidgets.QComboBox(self.centralwidget)
+        self.combobox_export.setGeometry(QtCore.QRect(100, 530, 191, 22))
+        self.combobox_export.setObjectName("combobox_export")
+        self.lineedit_export = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineedit_export.setGeometry(QtCore.QRect(310, 530, 113, 20))
+        self.lineedit_export.setObjectName("lineedit_export")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
@@ -153,6 +162,7 @@ class Ui_MainWindow(object):
         self.label_conv_stats.setText(_translate("MainWindow", "Statistics about the conversation"))
         self.label_visualisation_type.setText(_translate("MainWindow", "Visualisation type"))
         self.label_data_to_visualise.setText(_translate("MainWindow", "Data to visualise"))
+        self.pushbutton_export.setText(_translate("MainWindow", "Export"))
 
     def link(self):
         self.pushbutton_folder.clicked.connect(self.select_file)
@@ -184,6 +194,8 @@ class Ui_MainWindow(object):
         self.combobox_data_to_visualise.addItem('Messages')
         self.combobox_data_to_visualise.addItem('Words')
 
+        self.pushbutton_export.clicked.connect(self.export_messages)
+
     def select_file(self):
         self.label_folder_path.setText(QtWidgets.QFileDialog.getExistingDirectory())
 
@@ -199,6 +211,7 @@ class Ui_MainWindow(object):
         self.combobox_your_name.clear()
         for elem in data:
             self.combobox_your_name.addItem(elem)
+            self.combobox_export.addItem(elem)
 
     def get_conv_data(self):
         names = [x[1] for x in self.list_of_conv if x[0] == self.combobox_conversation.currentText()]
@@ -213,6 +226,19 @@ class Ui_MainWindow(object):
             pass
 
         self.textbrowser_conv_stats.setText(self.current_conv.get_basic_stats())
+
+    def export_messages(self):
+        filename = self.lineedit_export.text()
+        
+        if not filename:
+            filename = 'data.txt'
+
+        person = self.current_conv.persons[self.combobox_export.currentText()]
+
+        with open(filename + '.txt', 'w', encoding='utf8') as of:
+            for mess in person.messages:
+                of.write(mess['content'].encode('latin1').decode('utf8') + '\n') 
+
 
     def get_graph(self):
         self.current_conv.get_all_messages()
