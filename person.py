@@ -33,7 +33,11 @@ class Person:
     def number_of_words_per_message(self):
         messages_length = []
         for mess in self.messages:
-            messages_length.append(len(mess['content'].split()))
+            try:
+                messages_length.append(len(mess['content'].split()))
+            except KeyError:
+                messages_length.append(0)
+                
         return messages_length
 
     def total_number_of_words(self):
