@@ -229,7 +229,7 @@ class Ui_MainWindow(object):
 
     def export_messages(self):
         filename = self.lineedit_export.text()
-        
+
         if not filename:
             filename = 'data.txt'
 
@@ -237,7 +237,10 @@ class Ui_MainWindow(object):
 
         with open(filename + '.txt', 'w', encoding='utf8') as of:
             for mess in person.messages:
-                of.write(mess['content'].encode('latin1').decode('utf8') + '\n') 
+                try:
+                    of.write(mess['content'].encode('latin1').decode('utf8') + '\n')
+                except KeyError:
+                    pass
 
 
     def get_graph(self):
